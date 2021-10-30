@@ -1,4 +1,4 @@
-const ServidorModelo = require('./models/ServidorModelo.js')
+const ServidorModelo = require('./models/ServerModel.js')
 
 const server = new ServidorModelo()
 
