@@ -2,6 +2,9 @@ const express = require('express')
 const morgan = require('morgan')
 const { connectDB } = require('../Database/connection.js')
 const routes = require('../routes/routes.js')
+const pkg =  require('../package.json')
+const cors = require('cors')
+
 require('dotenv').config()
 
 class ServerModel{
@@ -9,15 +12,28 @@ class ServerModel{
         this.app = express()
         this.app.use(morgan('dev'))
         this.app.set('port', process.env.PORT || 3000)
+        this.app.set("pkg",pkg)
         this.connectionDB()
         this.callMiddlewares()
+
         // connectDB()
         this.routeRequests()
+        
         
     }
 
     routeRequests(){
         this.app.use('/api/v1/',routes) 
+        this.app.get("/api/v1", (req, res) => {
+            res.json({
+                message: "API Rest",
+                name: this.app.get("pkg").name,
+                version: this.app.get("pkg").version,
+                description: this.app.get("pkg").description,
+                author: this.app.get("pkg").author,
+                paths: this.list_routes(routes,'/api/v1')
+            });
+        });
     }
 
     connectionDB(){
@@ -35,6 +51,17 @@ class ServerModel{
 
     callMiddlewares(){
         this.app.use((express.json()))
+        this.app.use(cors())
+        //Initial route
+    }
+
+    list_routes(router, basePath=''){
+        return router.stack.filter(r => r.route).map(r => {
+            return {
+                method: Object.keys(r.route.methods)[0].toUpperCase(),
+                path: basePath + r.route.path
+            }
+        })
     }
 }
 
