@@ -54,13 +54,12 @@ class ServerModel{
         this.app.use(cors())
         //Initial route
     }
-
+ 
     list_routes(router, basePath=''){
         return router.stack.filter(r => r.route).map(r => {
-            return {
-                method: Object.keys(r.route.methods)[0].toUpperCase(),
-                path: basePath + r.route.path
-            }
+            return{
+                [Object.keys(r.route.methods)[0].toUpperCase()] : basePath + r.route.path
+            } 
         })
     }
 }
